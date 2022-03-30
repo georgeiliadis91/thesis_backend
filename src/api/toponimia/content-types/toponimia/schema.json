@@ -1,0 +1,18 @@
+{
+  "kind": "singleType",
+  "collectionName": "toponimias",
+  "info": {
+    "singularName": "toponimia",
+    "pluralName": "toponimias",
+    "displayName": "toponimia"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "toponimia": {
+      "type": "json"
+    }
+  }
+}

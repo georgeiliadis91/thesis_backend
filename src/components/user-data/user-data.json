@@ -1,0 +1,64 @@
+{
+  "collectionName": "components_user_data_user_data",
+  "info": {
+    "displayName": "user_data",
+    "icon": "address-book",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "surname": {
+      "type": "string",
+      "required": true
+    },
+    "father_name": {
+      "type": "string"
+    },
+    "mother_name": {
+      "type": "string"
+    },
+    "father_surname": {
+      "type": "string"
+    },
+    "mother_surname": {
+      "type": "string"
+    },
+    "birthdate": {
+      "type": "date"
+    },
+    "island": {
+      "type": "string",
+      "required": true
+    },
+    "birth_place": {
+      "type": "string",
+      "required": true
+    },
+    "current_country": {
+      "type": "string",
+      "required": true
+    },
+    "current_city": {
+      "type": "string"
+    },
+    "current_street": {
+      "type": "string"
+    },
+    "postal_code": {
+      "type": "string"
+    },
+    "occupation": {
+      "type": "string"
+    },
+    "phone_number": {
+      "type": "biginteger"
+    },
+    "other_groups": {
+      "type": "text"
+    }
+  }
+}
