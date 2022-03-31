@@ -68,6 +68,13 @@
       "repeatable": false,
       "component": "user-data.user-data",
       "required": true
+    },
+    "img": {
+      "allowedTypes": [
+        "images"
+      ],
+      "type": "media",
+      "multiple": false
     }
   }
 }

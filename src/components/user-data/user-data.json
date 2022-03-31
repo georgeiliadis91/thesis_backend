@@ -59,6 +59,13 @@
     },
     "other_groups": {
       "type": "text"
+    },
+    "profile_img": {
+      "allowedTypes": [
+        "images"
+      ],
+      "type": "media",
+      "multiple": false
     }
   }
 }
