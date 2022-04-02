@@ -61,11 +61,40 @@
       "type": "text"
     },
     "profile_img": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
       "allowedTypes": [
         "images"
-      ],
-      "type": "media",
-      "multiple": false
+      ]
+    },
+    "permissions": {
+      "type": "json",
+      "default": {
+        "everything": "me",
+        "username": "me",
+        "email": "me",
+        "profile_data": {
+          "name": "me",
+          "surname": "me",
+          "father_name": "me",
+          "mother_name": "me",
+          "father_surname": "me",
+          "mother_surname": "me",
+          "birthdate": "me",
+          "island": "me",
+          "birth_place": "me",
+          "current_country": "me",
+          "current_street": "me",
+          "postal_code": "me",
+          "occupation": "me",
+          "phone_number": "me",
+          "other_groups": "me",
+          "current_city": "me",
+          "profile_img": "me"
+        }
+      }
+
     }
   }
 }
