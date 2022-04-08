@@ -32,15 +32,18 @@
     },
     "island": {
       "type": "string",
-      "required": true
+      "required": true,
+      "default": "Samos"
     },
     "birth_place": {
       "type": "string",
-      "required": true
+      "required": true,
+      "default": "Samos"
     },
     "current_country": {
       "type": "string",
-      "required": true
+      "required": true,
+      "default": "Greece"
     },
     "current_city": {
       "type": "string"
@@ -64,9 +67,7 @@
       "type": "media",
       "multiple": false,
       "required": false,
-      "allowedTypes": [
-        "images"
-      ]
+      "allowedTypes": ["images"]
     },
     "permissions": {
       "type": "json",
