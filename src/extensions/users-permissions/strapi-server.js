@@ -3,7 +3,7 @@ const crypto = require("crypto");
 const permissionModel = {
   private: "private",
   public: "public",
-  authed: "authed",
+  authed: "authenticated",
 };
 
 module.exports = (plugin) => {
