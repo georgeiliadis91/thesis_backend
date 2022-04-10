@@ -78,7 +78,6 @@ module.exports = (plugin) => {
     if (!ctx.state.user) {
       return ctx.unauthorized();
     }
-    console.log("ctx.state.user", plugin, ctx);
 
     const user = await strapi.entityService.findOne(
       "plugin::users-permissions.user",
