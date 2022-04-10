@@ -1,3 +1,5 @@
+const crypto = require("crypto");
+
 module.exports = (plugin) => {
   const sanitizeOutput = (user) => {
     const {
@@ -68,6 +70,8 @@ module.exports = (plugin) => {
     if (!ctx.state.user) {
       return ctx.unauthorized();
     }
+    console.log("ctx.state.user", plugin, ctx);
+
     const user = await strapi.entityService.findOne(
       "plugin::users-permissions.user",
       ctx.state.user.id,
@@ -97,6 +101,54 @@ module.exports = (plugin) => {
     //TODO : sanitize output according to user permission object
 
     ctx.body = sanitizeOutput(sanitizeUserWithPermissions(ctx, user));
+  };
+
+  const userCreate = plugin.controllers.auth.register;
+
+  plugin.controllers.auth.register = async (ctx) => {
+    console.log("response body", userCreate, ctx.request.body);
+
+    ctx.request.body.email = ctx.request.body.email;
+    ctx.request.body.username = ctx.request.body.email;
+    ctx.request.body.password = ctx.request.body.password;
+    // .randomBytes(64)
+    // .toString(ctx.request.body.password);
+
+    ctx.request.body.profile_data = {
+      name: ctx.request.body.profile_data.name,
+      surname: ctx.request.body.profile_data.surname,
+      country: ctx.request.body.profile_data.country,
+      island: ctx.request.body.profile_data.island,
+      dimotiki_enotita: ctx.request.body.profile_data.dimotiki_enotita,
+      permissions: {
+        email: "private",
+        username: "private",
+        everything: "private",
+        profile_data: {
+          name: "private",
+          island: "private",
+          surname: "private",
+          birthdate: "private",
+          occupation: "private",
+          birth_place: "private",
+          father_name: "private",
+          mother_name: "private",
+          postal_code: "private",
+          profile_img: "private",
+          current_city: "private",
+          other_groups: "private",
+          phone_number: "private",
+          current_street: "private",
+          father_surname: "private",
+          mother_surname: "private",
+          current_country: "private",
+        },
+      },
+    };
+
+    ctx.request.body.confirmed = true;
+
+    await userCreate(ctx);
   };
 
   return plugin;

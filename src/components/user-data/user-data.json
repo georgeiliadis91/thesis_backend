@@ -70,31 +70,7 @@
       "allowedTypes": ["images"]
     },
     "permissions": {
-      "type": "json",
-      "default": {
-        "everything": "private",
-        "username": "private",
-        "email": "private",
-        "profile_data": {
-          "name": "private",
-          "surname": "private",
-          "father_name": "private",
-          "mother_name": "private",
-          "father_surname": "private",
-          "mother_surname": "private",
-          "birthdate": "private",
-          "island": "private",
-          "birth_place": "private",
-          "current_country": "private",
-          "current_street": "private",
-          "postal_code": "private",
-          "occupation": "private",
-          "phone_number": "private",
-          "other_groups": "private",
-          "current_city": "private",
-          "profile_img": "private"
-        }
-      }
+      "type": "json"
     }
   }
 }
