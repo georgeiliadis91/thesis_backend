@@ -9,11 +9,13 @@ const permissionModel = {
 module.exports = (plugin) => {
   const userCreate = plugin.controllers.auth.register;
 
+  //filter out fields we do not want to expose on the front end
   const sanitizeOutput = (user) => {
     const {
       password,
       resetPasswordToken,
       confirmationToken,
+      username,
       ...sanitizedUser
     } = user; // be careful, you need to omit other private attributes yourself
     return sanitizedUser;
@@ -114,7 +116,6 @@ module.exports = (plugin) => {
     const { private } = permissionModel;
 
     ctx.request.body.email = ctx.request.body.email;
-    ctx.request.body.username = ctx.request.body.email;
     ctx.request.body.password = ctx.request.body.password;
 
     ctx.request.body.profile_data = {
