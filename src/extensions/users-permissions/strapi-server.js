@@ -146,6 +146,7 @@ module.exports = (plugin) => {
           father_surname: private,
           mother_surname: private,
           current_country: private,
+          dimotiki_enotita: private,
         },
       },
     };

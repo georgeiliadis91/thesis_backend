@@ -67,10 +67,16 @@
       "type": "media",
       "multiple": false,
       "required": false,
-      "allowedTypes": ["images"]
+      "allowedTypes": [
+        "images"
+      ]
     },
     "permissions": {
       "type": "json"
+    },
+    "dimotiki_enotita": {
+      "type": "string",
+      "required": true
     }
   }
 }
