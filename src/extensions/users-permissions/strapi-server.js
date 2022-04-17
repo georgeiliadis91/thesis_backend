@@ -1,4 +1,5 @@
 const crypto = require("crypto");
+const _ = require("lodash");
 
 const permissionModel = {
   private: "private",
@@ -21,6 +22,7 @@ module.exports = (plugin) => {
     return sanitizedUser;
   };
 
+  //filter out fields we do not want to expose on the front end
   const sanitizeUserWithPermissions = (ctx, userData) => {
     const { permissions } = userData.profile_data;
 
@@ -30,52 +32,53 @@ module.exports = (plugin) => {
       isAuthenticated = true;
     }
 
-    // if me return empty object since its private to self
-    if (permissions.everything === "private") {
-      return {};
-    }
+    const newUser = {};
 
-    // if all return all the fields
-    if (permissions.everything === "public") {
-      return userData;
-    }
+    Object.keys(permissions).forEach((key) => {
+      const fieldKey = permissions[key];
 
-    if (permissions.everything === "custom") {
-      const newUser = {};
+      // skip iteration for everything key
+      if (key === "everything") {
+        return;
+      }
 
-      Object.keys(permissions).forEach((key) => {
-        const fieldKey = permissions[key];
+      if (
+        (fieldKey === "authenticated" && isAuthenticated) ||
+        fieldKey === "public"
+      ) {
+        newUser[key] = userData[key];
+      }
 
-        // skip iteration for everything key
-        if (key === "everything") {
-          return;
-        }
+      if (fieldKey === "private") {
+        return;
+      }
+      // if is profile_data object
+      if (key === "profile_data") {
+        const profileData = {};
 
-        if (fieldKey === "authed" || fieldKey === "public") {
-          newUser[key] = userData[key];
-        }
-        // if is profile_data object
-        if (key === "profile_data") {
-          const profileData = {};
+        Object.keys(permissions.profile_data).forEach((key) => {
+          const keyPermission = permissions.profile_data[key];
 
-          Object.keys(permissions.profile_data).forEach((key) => {
-            const keyPermission = permissions.profile_data[key];
+          if (
+            (fieldKey === "authenticated" && isAuthenticated) ||
+            fieldKey === "public"
+          ) {
+            profileData[keyPermission] = userData.profile_data[keyPermission];
+          }
 
-            if (keyPermission === "authed" || keyPermission === "all") {
-              profileData[key] = userData.profile_data[key];
-            }
-          });
+          if (fieldKey === "private") {
+            return;
+          }
+        });
 
-          newUser["profile_data"] = profileData;
-        }
-      });
+        newUser["profile_data"] = profileData;
+      }
+    });
 
-      return { newUser };
-    }
-
-    return userData;
+    return { newUser };
   };
 
+  // Get self
   plugin.controllers.user.me = async (ctx) => {
     if (!ctx.state.user) {
       return ctx.unauthorized();
@@ -90,6 +93,7 @@ module.exports = (plugin) => {
     ctx.body = sanitizeOutput(user);
   };
 
+  // Get all users
   plugin.controllers.user.find = async (ctx) => {
     const users = await strapi.entityService.findMany(
       "plugin::users-permissions.user",
@@ -97,9 +101,15 @@ module.exports = (plugin) => {
     );
     //TODO : sanitize output according to user permission object
 
-    ctx.body = users.map((user) => sanitizeOutput(user));
+    ctx.body = users
+      // filter out self
+      .filter((user) => {
+        return user.id !== ctx.state.user.id;
+      })
+      .map((user) => sanitizeOutput(user));
   };
 
+  // Get one user
   plugin.controllers.user.findOne = async (ctx) => {
     const user = await strapi.entityService.findOne(
       "plugin::users-permissions.user",
@@ -155,6 +165,79 @@ module.exports = (plugin) => {
 
     await userCreate(ctx);
   };
+
+  const getController = (name) => {
+    return strapi.plugins["users-permissions"].controller(name);
+  };
+
+  // Create the new controller
+  plugin.controllers.user.updateMe = async (ctx) => {
+    const user = ctx.state.user;
+
+    // User has to be logged in to update themselves
+    if (!user) {
+      return ctx.unauthorized();
+    }
+
+    // Pick only specific fields for security
+    const newData = _.pick(ctx.request.body, [
+      "email",
+      "username",
+      "password",
+      "confirmPassword",
+      "profile_data",
+    ]);
+
+    // Make sure there is no duplicate user with the same username
+    if (newData.username) {
+      const userWithSameUsername = await strapi
+        .query("plugin::users-permissions.user")
+        .findOne({ where: { username: newData.username } });
+
+      if (userWithSameUsername && userWithSameUsername.id != user.id) {
+        return ctx.badRequest("Username already taken");
+      }
+    }
+
+    // Make sure there is no duplicate user with the same email
+    if (newData.email) {
+      const userWithSameEmail = await strapi
+        .query("plugin::users-permissions.user")
+        .findOne({ where: { email: newData.email.toLowerCase() } });
+
+      if (userWithSameEmail && userWithSameEmail.id != user.id) {
+        return ctx.badRequest("Email already taken");
+      }
+      newData.email = newData.email.toLowerCase();
+    }
+
+    // Check if user is changing password and make sure passwords match
+    if (newData.password) {
+      if (!newData.confirmPassword) {
+        return ctx.badRequest("Missing password confirmation");
+      } else if (newData.password !== newData.confirmPassword) {
+        return ctx.badRequest("Passwords don't match");
+      }
+      delete newData.confirmPassword;
+    }
+    console.log("newData", newData);
+    // Reconstruct context so we can pass to the controller
+    ctx.request.body = newData;
+    ctx.params = { id: user.id };
+
+    // Update the user and return the sanitized data
+    return await getController("user").update(ctx);
+  };
+
+  // Add the custom route
+  plugin.routes["content-api"].routes.unshift({
+    method: "PUT",
+    path: "/users/me",
+    handler: "user.updateMe",
+    config: {
+      prefix: "",
+    },
+  });
 
   return plugin;
 };
