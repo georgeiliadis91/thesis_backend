@@ -37,11 +37,6 @@ module.exports = (plugin) => {
     Object.keys(permissions).forEach((key) => {
       const fieldKey = permissions[key];
 
-      // skip iteration for everything key
-      if (key === "everything") {
-        return;
-      }
-
       if (
         (fieldKey === "authenticated" && isAuthenticated) ||
         fieldKey === "public"
@@ -71,11 +66,17 @@ module.exports = (plugin) => {
           }
         });
 
-        newUser["profile_data"] = profileData;
+        if (!Object.keys(profileData).length === 0) {
+          newUser["profile_data"] = profileData;
+        }
       }
     });
+    //  if no keys found
+    if (Object.keys(newUser).length === 0) {
+      return null;
+    }
 
-    return { newUser };
+    return { id: userData.id, ...newUser };
   };
 
   // Get self
@@ -99,14 +100,15 @@ module.exports = (plugin) => {
       "plugin::users-permissions.user",
       { ...ctx.params, populate: ["profile_data", "profile_data.profile_img"] }
     );
-    //TODO : sanitize output according to user permission object
 
     ctx.body = users
       // filter out self
       .filter((user) => {
         return user.id !== ctx.state.user.id;
       })
-      .map((user) => sanitizeOutput(user));
+      .map((user) => {
+        return sanitizeUserWithPermissions(ctx, user);
+      });
   };
 
   // Get one user
@@ -119,7 +121,7 @@ module.exports = (plugin) => {
 
     //TODO : sanitize output according to user permission object
 
-    ctx.body = sanitizeOutput(sanitizeUserWithPermissions(ctx, user));
+    ctx.body = sanitizeUserWithPermissions(ctx, user);
   };
 
   plugin.controllers.auth.register = async (ctx) => {
@@ -137,7 +139,6 @@ module.exports = (plugin) => {
       permissions: {
         email: private,
         username: private,
-        everything: private,
         profile_data: {
           name: private,
           island: private,
@@ -220,7 +221,6 @@ module.exports = (plugin) => {
       }
       delete newData.confirmPassword;
     }
-    console.log("newData", newData);
     // Reconstruct context so we can pass to the controller
     ctx.request.body = newData;
     ctx.params = { id: user.id };
