@@ -8,6 +8,16 @@ const permissionModel = {
 };
 
 module.exports = (plugin) => {
+  // Add the custom route
+  plugin.routes["content-api"].routes.unshift({
+    method: "PUT",
+    path: "/users/me",
+    handler: "user.updateMe",
+    config: {
+      prefix: "",
+    },
+  });
+
   const userCreate = plugin.controllers.auth.register;
 
   //filter out fields we do not want to expose on the front end
@@ -104,7 +114,10 @@ module.exports = (plugin) => {
     ctx.body = users
       // filter out self
       .filter((user) => {
-        return user.id !== ctx.state.user.id;
+        if (ctx?.state?.user?.id) {
+          return user.id !== ctx.state.user.id;
+        }
+        return true;
       })
       .map((user) => {
         return sanitizeUserWithPermissions(ctx, user);
@@ -228,16 +241,6 @@ module.exports = (plugin) => {
     // Update the user and return the sanitized data
     return await getController("user").update(ctx);
   };
-
-  // Add the custom route
-  plugin.routes["content-api"].routes.unshift({
-    method: "PUT",
-    path: "/users/me",
-    handler: "user.updateMe",
-    config: {
-      prefix: "",
-    },
-  });
 
   return plugin;
 };
