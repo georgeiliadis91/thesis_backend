@@ -81,6 +81,7 @@ module.exports = (plugin) => {
         }
       }
     });
+
     //  if no keys found
     if (Object.keys(newUser).length === 0) {
       return null;
@@ -111,7 +112,7 @@ module.exports = (plugin) => {
       { ...ctx.params, populate: ["profile_data", "profile_data.profile_img"] }
     );
 
-    ctx.body = users
+    const tmpUser = users
       // filter out self
       .filter((user) => {
         if (ctx?.state?.user?.id) {
@@ -122,6 +123,8 @@ module.exports = (plugin) => {
       .map((user) => {
         return sanitizeUserWithPermissions(ctx, user);
       });
+
+    ctx.body = tmpUser.filter((user) => user !== null);
   };
 
   // Get one user
@@ -131,8 +134,6 @@ module.exports = (plugin) => {
       ctx.params.id,
       { ...ctx.params, populate: ["profile_data", "profile_data.profile_img"] }
     );
-
-    //TODO : sanitize output according to user permission object
 
     ctx.body = sanitizeUserWithPermissions(ctx, user);
   };
@@ -234,6 +235,7 @@ module.exports = (plugin) => {
       }
       delete newData.confirmPassword;
     }
+
     // Reconstruct context so we can pass to the controller
     ctx.request.body = newData;
     ctx.params = { id: user.id };
