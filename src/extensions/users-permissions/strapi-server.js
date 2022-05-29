@@ -17,6 +17,15 @@ module.exports = (plugin) => {
       prefix: "",
     },
   });
+  //
+  plugin.routes["content-api"].routes.unshift({
+    method: "GET",
+    path: "/users/countries",
+    handler: "user.countries",
+    config: {
+      prefix: "",
+    },
+  });
 
   const userCreate = plugin.controllers.auth.register;
 
@@ -60,23 +69,22 @@ module.exports = (plugin) => {
       // if is profile_data object
       if (key === "profile_data") {
         const profileData = {};
-
         Object.keys(permissions.profile_data).forEach((key) => {
           const keyPermission = permissions.profile_data[key];
 
           if (
-            (fieldKey === "authenticated" && isAuthenticated) ||
-            fieldKey === "public"
+            (keyPermission === "authenticated" && isAuthenticated) ||
+            keyPermission === "public"
           ) {
-            profileData[keyPermission] = userData.profile_data[keyPermission];
+            profileData[key] = userData.profile_data[key];
           }
 
-          if (fieldKey === "private") {
+          if (keyPermission === "private") {
             return;
           }
         });
 
-        if (!Object.keys(profileData).length === 0) {
+        if (Object.keys(profileData).length > 0) {
           newUser["profile_data"] = profileData;
         }
       }
@@ -132,7 +140,7 @@ module.exports = (plugin) => {
     const user = await strapi.entityService.findOne(
       "plugin::users-permissions.user",
       ctx.params.id,
-      { ...ctx.params, populate: ["profile_data" ] }
+      { ...ctx.params, populate: ["profile_data"] }
     );
 
     ctx.body = sanitizeUserWithPermissions(ctx, user);
@@ -147,7 +155,7 @@ module.exports = (plugin) => {
     ctx.request.body.profile_data = {
       name: ctx.request.body.profile_data.name,
       surname: ctx.request.body.profile_data.surname,
-      country: ctx.request.body.profile_data.country,
+      current_country: ctx.request.body.profile_data.current_country,
       island: ctx.request.body.profile_data.island,
       dimotiki_enotita: ctx.request.body.profile_data.dimotiki_enotita,
       permissions: {
@@ -241,6 +249,32 @@ module.exports = (plugin) => {
 
     // Update the user and return the sanitized data
     return await getController("user").update(ctx);
+  };
+
+  plugin.controllers.user.countries = async (ctx) => {
+    const users = await strapi.entityService.findMany(
+      "plugin::users-permissions.user",
+      { ...ctx.params, populate: ["profile_data"] }
+    );
+
+    console.log("users", users);
+    const countryList = {};
+    // extract unique country names and increament the count
+    users.forEach((user) => {
+      if (
+        user.profile_data.current_country !== undefined &&
+        user.profile_data.current_country !== null
+      ) {
+        if (
+          Object.keys(countryList).includes(user.profile_data.current_country)
+        ) {
+          countryList[user.profile_data.current_country] += 1;
+        } else {
+          countryList[user.profile_data.current_country] = 1;
+        }
+      }
+    });
+    ctx.body = countryList;
   };
 
   return plugin;
