@@ -99,7 +99,7 @@ module.exports = (plugin) => {
     const user = await strapi.entityService.findOne(
       "plugin::users-permissions.user",
       ctx.state.user.id,
-      { populate: ["profile_data", "profile_data.profile_img"] }
+      { populate: ["profile_data"] }
     );
 
     ctx.body = sanitizeOutput(user);
@@ -109,7 +109,7 @@ module.exports = (plugin) => {
   plugin.controllers.user.find = async (ctx) => {
     const users = await strapi.entityService.findMany(
       "plugin::users-permissions.user",
-      { ...ctx.params, populate: ["profile_data", "profile_data.profile_img"] }
+      { ...ctx.params, populate: ["profile_data"] }
     );
 
     const tmpUser = users
@@ -132,7 +132,7 @@ module.exports = (plugin) => {
     const user = await strapi.entityService.findOne(
       "plugin::users-permissions.user",
       ctx.params.id,
-      { ...ctx.params, populate: ["profile_data", "profile_data.profile_img"] }
+      { ...ctx.params, populate: ["profile_data" ] }
     );
 
     ctx.body = sanitizeUserWithPermissions(ctx, user);
@@ -163,7 +163,6 @@ module.exports = (plugin) => {
           father_name: private,
           mother_name: private,
           postal_code: private,
-          profile_img: private,
           current_city: private,
           other_groups: private,
           phone_number: private,
