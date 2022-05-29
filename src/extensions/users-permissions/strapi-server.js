@@ -257,7 +257,6 @@ module.exports = (plugin) => {
       { ...ctx.params, populate: ["profile_data"] }
     );
 
-    console.log("users", users);
     const countryList = {};
     // extract unique country names and increament the count
     users.forEach((user) => {
