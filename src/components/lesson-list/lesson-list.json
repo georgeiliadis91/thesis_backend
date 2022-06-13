@@ -1,0 +1,32 @@
+{
+  "collectionName": "components_lesson_list_lesson_lists",
+  "info": {
+    "displayName": "lesson_list",
+    "icon": "archway",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "link": {
+      "type": "string"
+    },
+    "img_lnk": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "kids": {
+      "type": "boolean"
+    }
+  }
+}

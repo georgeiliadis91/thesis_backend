@@ -1,0 +1,25 @@
+{
+  "kind": "collectionType",
+  "collectionName": "lessons",
+  "info": {
+    "singularName": "lesson",
+    "pluralName": "lessons",
+    "displayName": "lessons",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Topic": {
+      "type": "string",
+      "required": true
+    },
+    "list": {
+      "type": "component",
+      "repeatable": true,
+      "component": "lesson-list.lesson-list"
+    }
+  }
+}
