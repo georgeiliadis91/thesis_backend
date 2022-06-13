@@ -1,0 +1,25 @@
+{
+  "kind": "collectionType",
+  "collectionName": "advisors",
+  "info": {
+    "singularName": "advisor",
+    "pluralName": "advisors",
+    "displayName": "advisor",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "island": {
+      "type": "string",
+      "required": true
+    },
+    "list": {
+      "type": "component",
+      "repeatable": true,
+      "component": "advisor-list.advisor-list"
+    }
+  }
+}
