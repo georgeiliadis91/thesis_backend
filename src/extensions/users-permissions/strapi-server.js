@@ -257,7 +257,11 @@ module.exports = (plugin) => {
       { ...ctx.params, populate: ["profile_data"] }
     );
 
+    console.log("users", users);
     const countryList = {};
+    const islandList = {};
+    const birthPlaceList = {};
+    const dimotikiEnotitaList = {};
     // extract unique country names and increament the count
     users.forEach((user) => {
       if (
@@ -272,8 +276,49 @@ module.exports = (plugin) => {
           countryList[user.profile_data.current_country] = 1;
         }
       }
+      if (
+        user.profile_data.island !== undefined &&
+        user.profile_data.island !== null
+      ) {
+        if (Object.keys(islandList).includes(user.profile_data.island)) {
+          islandList[user.profile_data.island] += 1;
+        } else {
+          islandList[user.profile_data.island] = 1;
+        }
+      }
+      if (
+        user.profile_data.birth_place !== undefined &&
+        user.profile_data.birth_place !== null
+      ) {
+        if (
+          Object.keys(birthPlaceList).includes(user.profile_data.birth_place)
+        ) {
+          birthPlaceList[user.profile_data.birth_place] += 1;
+        } else {
+          birthPlaceList[user.profile_data.birth_place] = 1;
+        }
+      }
+      if (
+        user.profile_data.dimotiki_enotita !== undefined &&
+        user.profile_data.dimotiki_enotita !== null
+      ) {
+        if (
+          Object.keys(dimotikiEnotitaList).includes(
+            user.profile_data.dimotiki_enotita
+          )
+        ) {
+          dimotikiEnotitaList[user.profile_data.dimotiki_enotita] += 1;
+        } else {
+          dimotikiEnotitaList[user.profile_data.dimotiki_enotita] = 1;
+        }
+      }
     });
-    ctx.body = countryList;
+    ctx.body = {
+      countryList,
+      islandList,
+      birthPlaceList,
+      dimotikiEnotitaList,
+    };
   };
 
   return plugin;
